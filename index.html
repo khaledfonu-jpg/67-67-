@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101827">
+<title>حياة التاجر — لعبة الاقتصاد</title>
+<style>
+:root{--bg:#0b1220;--panel:#141f31;--panel2:#1b2a40;--text:#eef5ff;--muted:#9db0c9;--gold:#f6c85f;--green:#53d6a0;--red:#ff7777;--blue:#76b7ff}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(160deg,#101b2e,#09101c);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:pan-y}
+header{padding:16px 14px 12px;background:#101827;position:sticky;top:0;z-index:5;border-bottom:1px solid #26364d}
+h1{font-size:21px;margin:0 0 10px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:#1a273a;border:1px solid #2b3b52;border-radius:12px;padding:9px}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:16px}
+nav{display:flex;gap:7px;overflow-x:auto;padding:10px;background:#101827;position:sticky;top:139px;z-index:4}
+button,select,input{font:inherit}
+button{touch-action:manipulation;cursor:pointer;border:0;border-radius:11px;padding:11px 13px;min-height:44px;background:#2a3b54;color:var(--text);font-weight:650}
+button:active{transform:scale(.98)}
+button.primary{background:#d8a83c;color:#151a23}
+button.good{background:#187957}
+button.danger{background:#803c48}
+button:disabled{opacity:.45;cursor:not-allowed}
+.tab{white-space:nowrap}
+.tab.active{background:#f6c85f;color:#18202b}
+main{padding:12px;max-width:900px;margin:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.card{background:linear-gradient(145deg,#19273a,#121d2d);border:1px solid #2a3b51;border-radius:15px;padding:13px;margin-bottom:10px}
+.card h2,.card h3{margin:0 0 9px}
+.card h2{font-size:18px}
+.card h3{font-size:15px}
+.muted{color:var(--muted)}
+.big{font-size:22px;font-weight:800;color:var(--gold)}
+.line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:7px 0}
+.line span{min-width:0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#263951;color:#cfe2ff;font-size:12px}
+.progress{height:8px;background:#2a394d;border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#52d6a0,#f6c85f)}
+.notice{padding:10px;border-radius:10px;background:#25344a;color:#dbe9fa;margin:8px 0}
+.log{max-height:240px;overflow:auto}
+.log p{margin:6px 0;padding-bottom:6px;border-bottom:1px solid #28364a;font-size:13px}
+.price{color:var(--green);font-weight:750}
+.negative{color:var(--red)}
+input,select{width:100%;padding:11px;border-radius:10px;background:#0d1726;color:var(--text);border:1px solid #34465e;margin:5px 0 9px;min-height:44px}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+<h1>🏙️ حياة التاجر: لعبة الاقتصاد</h1>
+<div class="stats">
+<div class="stat"><small>💵 الرصيد</small><b id="money">$1,000</b></div>
+<div class="stat"><small>⭐ المستوى</small><b id="level">0</b></div>
+<div class="stat"><small>🏦 البنك</small><b id="bank">$0</b></div>
+<div class="stat"><small>📈 صافي الثروة</small><b id="net">$1,000</b></div>
+</div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+<footer>لعبة افتراضية — يتم الحفظ تلقائياً على هذا الجهاز</footer>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),fmt=n=>'$'+Math.floor(n).toLocaleString('en-US'),now=()=>Date.now();
+const tabs=[['home','🏠 الرئيسية'],['jobs','💼 الوظائف'],['market','📊 السوق'],['estate','🏘️ العقارات'],['bank','🏦 البنك'],['invest','📈 الاستثمار'],['life','🧾 الحياة'],['tasks','🎯 المهام'],['quiz','🧠 التحديات'],['records','📜 السجل'],['save','💾 الحفظ']];
+const resources=[
+['🛢️ النفط',120],['🔥 الغاز',75],['🥇 الذهب',250],['☢️ اليورانيوم',400],['🪵 الخشب',25],['🪨 الحجر',18],['🔩 الحديد',42],['🌾 القمح',12],['💎 الألماس',800],['🔋 الليثيوم',95],['🧵 القطن',16],['🐟 السمك',14]
+];
+const jobs=[['عامل تنظيف',15],['عامل متجر',25],['مساعد مخزن',35],['سائق توصيل',45],['موظف استقبال',60],['فني صيانة',75],['مساعد محاسب',90],['محاسب',110],['مندوب مبيعات',140],['ممرض',170],['معلم',200],['مبرمج مبتدئ',240],['مهندس',300],['محلل مالي',380],['مدير فرع',480],['مدير شركة',650],['مدير إقليمي',850],['رائد أعمال',1100],['مدير تنفيذي',1500],['رئيس مجموعة شركات',2200],['رئيس مجلس إدارة',3500],['مستشار حكومي',5000],['وزير',7500],['رئيس وزراء',12000],['رئيس دولة',20000]];
+const titlesForLevel=l=>l<=3?'مواطن عادي':l<=10?'تاجر':l<=20?'رئيس شركة':l<=30?'رئيس شركة كبرى':l<=50?'رئيس شركات':l<=75?'الرئيس الثاني':l<=100?'رئيس دولة':l===101?'رئيس العالم':'رئيس العالم — مستوى '+l;
+function salaryForLevel(l){if(l<=1)return 100;if(l<=10)return 100+(l-1)*70;if(l<=25)return 730+(l-10)*200;if(l<=50)return 3730+(l-25)*1500;if(l<=60)return 41230+(l-50)*3000;if(l<=80)return 71230+(l-60)*6500;if(l<=100)return 201230+(l-80)*15000;return 501230+(l-100)*100;}
+const houses=[['غرفة صغيرة',1200,35],['شقة بسيطة',6500,180],['شقة وسط المدينة',18000,520],['بيت عائلي',42000,1250],['فيلا',110000,3500],['برج تجاري',300000,10500],['مجمع سكني',800000,29000],['مزرعة صغيرة',9500,260],['مزرعة كبيرة',68000,1800],['مستودع',26000,700],['محل تجاري',35000,1050],['مكتب صغير',52000,1500],['مكتب فاخر',190000,6200],['فندق صغير',450000,14000],['فندق فاخر',1800000,58000],['برج مكاتب',3200000,105000],['مول تجاري',5500000,185000],['محطة وقود',720000,24000],['مصنع غذائي',1250000,41000],['مصنع سيارات',8500000,270000],['ميناء شحن',12000000,390000],['مطار خاص',28000000,920000],['منتجع سياحي',4100000,135000],['مستشفى خاص',6700000,220000],['جامعة خاصة',5900000,190000],['مبنى حكومي',9400000,310000],['برج سكني',2400000,78000],['مجمع فلل',3800000,125000],['مدينة صناعية',35000000,1150000],['مدينة سكنية',48000000,1600000],['منجم ذهب',21000000,700000],['حقل نفط',65000000,2200000],['حقل غاز',52000000,1750000],['مصفاة نفط',88000000,2900000],['مزرعة ألماس',73000000,2450000],['مركز بيانات',16000000,530000],['شركة اتصالات',27000000,900000],['استوديو إعلامي',1800000,59000],['مركز تسوق فاخر',11000000,365000],['قصر',18000000,600000],['جزيرة خاصة',95000000,3200000],['مقر شركة عالمية',130000000,4300000],['مجمع أبراج',175000000,5800000],['منطقة لوجستية',62000000,2050000],['محطة طاقة شمسية',33000000,1100000],['محطة كهرباء',47000000,1550000],['شبكة قطارات',150000000,5000000],['ميناء نفطي',190000000,6300000],['مدينة ترفيهية',85000000,2800000],['مركز مالي عالمي',220000000,7300000],['شركة تعدين',115000000,3800000],['منصة تجارة إلكترونية',38000000,1250000],['شركة طيران',250000000,8300000],['مطار دولي',420000000,14000000],['مركز أبحاث',76000000,2500000],['قاعدة فضائية',600000000,20000000],['مركز ذكاء اصطناعي',125000000,4100000],['محطة تحلية',57000000,1900000],['مزرعة عملاقة',24000000,800000],['مصفاة معادن',145000000,4800000],['سلسلة فنادق',310000000,10300000],['مجمع طبي عالمي',285000000,9500000],['منطقة اقتصادية',510000000,17000000],['مدينة ذكية',850000000,28000000],['شبكة موانئ',720000000,24000000],['مجموعة نفط عالمية',1200000000,40000000],['شركة فضاء',1800000000,60000000],['عاصمة تجارية',2500000000,83000000],['إمبراطورية عقارية',5000000000,165000000],['دولة استثمارية',12000000000,400000000],['قارة اقتصادية',30000000000,1000000000],['كوكب صناعي',80000000000,2600000000],['مستعمرة فضائية',200000000000,6500000000],['اتحاد كواكب',500000000000,16000000000],['إمبراطورية مجرية',900000000000,30000000000]];
+const investmentOptions=[['سندات حكومية',0.012,0.003,'منخفضة'],['صندوق مستقر',0.015,0.004,'منخفضة'],['ذهب',0.025,0.018,'منخفضة'],['صندوق مؤشرات',0.032,0.016,'منخفضة'],['أسهم شركات كبرى',0.045,0.025,'متوسطة'],['عقارات تجارية',0.05,0.022,'متوسطة'],['النفط',0.065,0.045,'متوسطة'],['الغاز الطبيعي',0.06,0.04,'متوسطة'],['القمح والحبوب',0.035,0.03,'متوسطة'],['المعادن',0.055,0.04,'متوسطة'],['النقل والشحن',0.052,0.03,'متوسطة'],['الاتصالات',0.047,0.025,'متوسطة'],['الرعاية الصحية',0.05,0.03,'متوسطة'],['الطاقة الشمسية',0.075,0.05,'متوسطة'],['البنية التحتية',0.04,0.018,'منخفضة'],['صناعة السيارات',0.07,0.05,'متوسطة'],['الذكاء الاصطناعي',0.11,0.08,'عالية'],['شركات ناشئة',0.13,0.10,'عالية'],['الألعاب الإلكترونية',0.10,0.075,'عالية'],['التجارة الإلكترونية',0.095,0.07,'عالية'],['العملات الرقمية الافتراضية',0.16,0.14,'عالية'],['الطيران',0.08,0.065,'عالية'],['السياحة والفنادق',0.075,0.055,'متوسطة'],['المياه والتحلية',0.06,0.035,'متوسطة'],['التعدين',0.10,0.075,'عالية'],['الفضاء',0.14,0.11,'عالية'],['أشباه الموصلات',0.12,0.085,'عالية'],['الأدوية والتقنية الطبية',0.085,0.05,'متوسطة'],['صندوق عالمي متنوع',0.055,0.025,'متوسطة'],['مشروع عالي المخاطرة',0.22,0.18,'عالية']];
+const defaults=()=>({money:1000,bank:0,level:0,spent:0,job:0,lastPay:now(),payCount:0,streak:0,lastLogin:'',dailyClaim:'',streakPointDate:'',streakPoints:0,properties:[],inventory:Array(resources.length).fill(0),investments:[],prices:resources.map(x=>x[1]),priceAt:now(),debt:0,expensesAt:now(),lastRent:now(),lastInterest:now(),lastNews:'',tasksDone:[],quizCount:0,quizCorrect:0,history:[],events:[],dayTask:new Date().toDateString(),taskProgress:0});
+let s;try{s=Object.assign(defaults(),JSON.parse(localStorage.getItem('merchantLifeFreshSave')||'{}'))}catch{s=defaults()}
+let tab='home',quiz=null,toastTimer,answeredQuestion=false;
+function save(){localStorage.setItem('merchantLifeFreshSave',JSON.stringify(s));updateTop()}
+function log(msg){s.history.unshift(new Date().toLocaleString('ar',{hour:'2-digit',minute:'2-digit'})+' — '+msg);s.history=s.history.slice(0,80);save()}
+function notify(m){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.style.cssText='position:fixed;bottom:18px;left:12px;right:12px;z-index:20;background:#f6c85f;color:#17202d;padding:13px;border-radius:12px;text-align:center;font-weight:800;box-shadow:0 6px 24px #0008';document.body.append(el)}el.textContent=m;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',2500)}
+function addMoney(n,why){s.money+=n;if(n<0)s.debt+=Math.max(0,-n-s.money);log((n>=0?'+':'')+fmt(n)+' — '+why)}
+function levelFromSpent(spent){if(spent<1000000)return Math.floor(spent/10000);if(spent<100000000)return 100;return Math.min(100000,101+Math.floor((spent-100000000)/10000));}
+function payCost(n,why){if(s.money<n){notify('فلوسك ما تكفي!');return false}s.money-=n;s.spent+=n;let old=s.level;s.level=levelFromSpent(s.spent);if(s.level>old)log('ترقية للمستوى '+s.level+'!');log('شراء/دفع '+fmt(n)+' — '+why);save();return true}
+function updateTop(){if(!s)return;$('#money').textContent=fmt(s.money);$('#level').textContent=s.level.toLocaleString('en-US');$('#bank').textContent=fmt(s.bank);$('#net').textContent=fmt(s.money+s.bank+s.properties.reduce((a,i)=>a+houses[i][1],0)+s.inventory.reduce((a,q,i)=>a+q*s.prices[i],0)-s.debt)}
+function nav(){$('#nav').innerHTML=tabs.map(([id,label])=>`<button class="tab ${id===tab?'active':''}" data-tab="${id}">${label}</button>`).join('')}
+function card(title,body){return `<section class="card"><h2>${title}</h2>${body}</section>`}
+function btn(label,act,cls=''){return `<button class="${cls}" data-act="${act}">${label}</button>`}
+function home(){let next=s.level<100?Math.max(0,10000-(s.spent%10000)):s.level===100?Math.max(0,100000000-s.spent):Math.max(0,10000-((s.spent-100000000)%10000));return card('مرحباً بالتاجر 👋',`<div class="grid"><div class="stat"><small>مستوى الوظيفة</small><b>${titlesForLevel(s.level)}</b></div><div class="stat"><small>راتب الوظيفة</small><b>${fmt(Math.floor(salaryForLevel(s.level)*(1+s.job*.02)))} / 5 دقائق</b></div><div class="stat"><small>الستريك</small><b>${s.streak||0} يوم / ${s.streakPoints||0} نقطة</b></div><div class="stat"><small>العقارات</small><b>${s.properties.length}/75</b></div><div class="stat"><small>الدين</small><b class="${s.debt?'negative':''}">${fmt(s.debt)}</b></div></div><div class="notice">🏅 رتبتك: ${titlesForLevel(s.level)} — المستوى ${s.level}. تحتاج إنفاق ${fmt(next)} إضافية للترقية التالية. أسعار السوق تتغير تلقائياً كل 5 دقائق. نقاط الستريك: ${s.streakPoints||0} ⭐.</div><div class="row">${btn('استلام راتب الوظيفة','work','primary')}${btn('هدية اليوم','daily','good')}</div>`) + card('📅 ملخص اليوم',`<p>راتبك كل 5 دقائق، إيجار العقارات كل ساعة، وفائدة البنك كل 24 ساعة.</p><div class="line"><span>إجابات صحيحة</span><b>${s.quizCorrect}/${s.quizCount}</b></div><div class="line"><span>دفعات العمل</span><b>${s.payCount}</b></div><div class="line"><span>المهام المنجزة</span><b>${s.tasksDone.length}</b></div>`) + card('📰 آخر الأحداث',`<div class="log">${s.events.slice(0,4).map(x=>`<p>${x}</p>`).join('')||'<p class="muted">ماكو أحداث بعد.</p>'}</div>`)}
+function jobsPage(){return card('💼 الوظائف والترقية',`<p class="muted">ما تقدر تختار أي وظيفة على مزاجك؛ لازم مستواك يحقق شرط الوظيفة. الترقية تلقائية حسب الإنفاق، والأسئلة غير محدودة.</p><div class="notice">رتبتك الحالية: <b>${titlesForLevel(s.level)}</b> — المستوى ${s.level}<br>الراتب: <b>${fmt(salaryForLevel(s.level))}</b><br>المتبقي: <b id="paytimer">...</b></div><div class="grid">${jobs.map((j,i)=>{let req=Math.min(101,Math.floor(i*101/(jobs.length-1))),eligible=s.level>=req;return `<div class="card"><h3>${j[0]}</h3><p>المستوى المطلوب: ${req}</p><p>${eligible?'✅ مؤهل':'🔒 تحتاج مستوى أعلى'}</p>${btn(s.job===i?'✓ وظيفتك الحالية':eligible?'تعيين بهذه الوظيفة':'غير متاحة',`job:${i}`,s.job===i?'good':'')}</div>`}).join('')}</div>${btn('استلام الراتب إذا حان موعده','work','primary')}`)}
+function market(){return card('📊 سوق الموارد',`<p class="muted">الأسعار تتذبذب كل 5 دقائق. اشترِ بسعر اليوم وبِع بالسعر الحالي.</p><div class="grid">${resources.map((r,i)=>`<div class="card"><h3>${r[0]}</h3><div class="big">${fmt(s.prices[i])}</div><small class="muted">مخزونك: ${s.inventory[i]}</small><div class="row">${btn('شراء 1',`buy:${i}`)}${btn('بيع 1',`sell:${i}`)}</div><div class="row">${btn('شراء 5',`buy5:${i}`)}${btn('بيع الكل',`sellall:${i}`)}</div></div>`).join('')}</div>`)}
+function estate(){return card('🏘️ العقارات والإيجار',`<p>تقدر تمتلك لحد 75 عقار. الإيجار يدخل رصيدك كل ساعة، بس العقار يحتاج مصاريف صيانة بسيطة.</p><div class="notice">العقارات الحالية: ${s.properties.length}/75</div><div class="grid">${houses.map((h,i)=>`<div class="card"><h3>${h[0]}</h3><p>السعر: <b>${fmt(h[1])}</b></p><p class="price">إيجار الساعة: ${fmt(h[2])}</p>${btn('شراء عقار',`house:${i}`,'primary')}</div>`).join('')}</div><h3>ممتلكاتك</h3>${s.properties.map((i,n)=>`<div class="line"><span>${houses[i][0]} #${n+1}</span>${btn('بيع بـ 70%',`sellhouse:${n}`)}</div>`).join('')||'<p class="muted">بعدك ما تملك عقارات.</p>'}`)}
+function bank(){return card('🏦 البنك',`<p>فلوس البنك آمنة وتكسب فائدة 1% كل 24 ساعة. التحويلات فورية.</p><div class="big">رصيد البنك: ${fmt(s.bank)}</div><label>المبلغ</label><input id="bankamount" type="number" min="1" placeholder="اكتب المبلغ"><div class="row">${btn('إيداع','deposit','good')}${btn('سحب','withdraw')}</div><hr><h3>💳 تسديد الدين</h3><p>الدين الحالي: <b class="negative">${fmt(s.debt)}</b></p>${btn('سداد الدين من الرصيد','repay','primary')}`)}
+function investPage(){return card('📈 الاستثمار',`<p>النتيجة تظهر بعد 5 دقائق من الاستثمار.</p><div class="grid">${investmentOptions.map((o,i)=>`<div class="card"><h3>${o[0]}</h3><p>${o[3]} المخاطرة</p><p class="muted">احتمال الربح ${Math.round(o[1]*100)}% / الخسارة ${Math.round(o[2]*100)}%</p><label>المبلغ</label><input type="number" id="investamount${i}" min="50" placeholder="المبلغ للاستثمار">${btn('استثمار لمدة 5 دقائق',`invest:${i}`,'primary')}</div>`).join('')}</div><h3>استثماراتك الحالية</h3>${s.investments.map((x,i)=>{let ready=now()-x.at>=300000;return `<div class="card"><div class="line"><b>${investmentOptions[x.type][0]}</b><span>الأصل: ${fmt(x.amount)}</span></div><p>${ready?'✅ النتيجة جاهزة':'⏳ باقي '+Math.ceil((300000-(now()-x.at))/1000)+' ثانية'}</p><p class="muted">النتيجة: ${x.win?'ربح':'خسارة'} ${fmt(Math.abs(x.result-x.amount))}</p>${btn(ready?'استلام نتيجة الاستثمار':'انتظر حتى تكتمل 5 دقائق',`cashout:${i}`,ready?'primary':'')}</div>`}).join('')||'<p class="muted">ما عندك استثمارات حالياً.</p>'}`)}
+function life(){return card('🧾 الحياة اليومية',`<p>كل 24 ساعة تُخصم مصاريف معيشة تعتمد على مستوى اللاعب والعقارات.</p><div class="line"><span>مصاريف اليوم التقديرية</span><b>${fmt(30+s.level*2+s.properties.length*15)}</b></div><div class="line"><span>الدين الحالي</span><b>${fmt(s.debt)}</b></div><div class="notice">إذا ما عندك رصيد كافي، تُضاف المصاريف غير المدفوعة إلى الدين.</div>`)}
+function tasks(){let list=[['أنفق 1,000 دولار',1000,100],['اشترِ 3 موارد',3,75],['جاوب على 3 أسئلة',3,125],['امتلك عقاراً',1,200],['استلم راتبين',2,100]];return card('🎯 المهام والمكافآت',`<p>أنجز الأهداف حتى تكسب مكافآت.</p>${list.map((t,i)=>`<div class="card"><h3>${t[0]}</h3><p>المكافأة: ${fmt(t[2])}</p><span class="pill">${s.tasksDone.includes(i)?'مكتملة':'متاحة'}</span> ${btn(s.tasksDone.includes(i)?'تم الإنجاز':'استلام المكافأة',`task:${i}`,s.tasksDone.includes(i)?'good':'')}</div>`).join('')}`)}
+function quizPage(){if(!quiz)newQuestion();return card('🧠 تحدي الحساب',`<p class="muted">كل إجابة صحيحة تعطيك مكافأة.</p><label>مستوى السؤال</label><select id="difficulty"><option value="easy">سهل — $5</option><option value="medium">متوسط — $15</option><option value="hard">صعب — $30</option><option value="expert">خبير — $50</option></select><div class="notice" style="font-size:22px;text-align:center"><b>${quiz.q}</b></div><input id="answer" type="number" placeholder="اكتب جوابك"><div class="row">${btn('تحقق من الإجابة','answer','primary')}${btn('سؤال جديد','newq')}</div><p>الإجابات الصحيحة: ${s.quizCorrect} من ${s.quizCount}</p>`)}
+function records(){return card('📜 سجل الحسابات',`<div class="log">${s.history.map(x=>`<p>${x}</p>`).join('')||'<p>ماكو حركات مسجلة بعد.</p>'}</div>${btn('مسح السجل فقط','clearlog','danger')}`)}
+function savePage(){return card('💾 الحفظ والنسخ الاحتياطي',`<p>اللعبة تحفظ تقدمك تلقائياً على نفس الجهاز والمتصفح.</p><div class="row">${btn('تصدير نسخة احتياطية','export','primary')}<label class="card" style="text-align:center;cursor:pointer">استيراد نسخة<input id="importfile" type="file" accept=".json,application/json"></label></div>${btn('بدء لعبة جديدة (يمسح التقدم)','reset','danger')}<p class="muted">احتفظ بملف النسخة الاحتياطية إذا بدلت المتصفح أو الجهاز.</p>`)}
+function render(){nav();let pages={home,jobs:jobsPage,market,estate,bank,invest:investPage,life,tasks,quiz:quizPage,records,save:savePage};$('#view').innerHTML=pages[tab]();updateTop();if(tab==='jobs')timer()}
+function newQuestion(){let d=Math.floor(Math.random()*4),a,b,op,ans;if(d===0){a=2+Math.floor(Math.random()*30);b=2+Math.floor(Math.random()*20);op='+';ans=a+b}else if(d===1){a=5+Math.floor(Math.random()*50);b=2+Math.floor(Math.random()*a);op='−';ans=a-b}else if(d===2){a=2+Math.floor(Math.random()*15);b=2+Math.floor(Math.random()*12);op='×';ans=a*b}else{b=2+Math.floor(Math.random()*12);ans=2+Math.floor(Math.random()*20);a=b*ans;op='÷';ans=a/b}quiz={q:`${a} ${op} ${b} = ؟`,ans};answeredQuestion=false}
+function timer(){let el=$('#paytimer');if(!el)return;let left=Math.max(0,300000-(now()-s.lastPay));el.textContent=left?Math.ceil(left/1000)+' ثانية':'جاهز للاستلام'}
+function work(){let elapsed=now()-s.lastPay;if(elapsed<300000){notify('بعد ما حان وقت الراتب! انتظر '+Math.ceil((300000-elapsed)/1000)+' ثانية.');return}let amount=Math.floor(salaryForLevel(s.level)*(1+s.job*.02));s.lastPay=now();s.payCount++;s.taskProgress++;s.money+=amount;log('راتب الوظيفة '+fmt(amount));if(s.payCount%5===0){let bonus=Math.floor(amount*.25);s.money+=bonus;log('مكافأة سلسلة العمل '+fmt(bonus));notify('راتب + مكافأة سلسلة العمل!')}else notify('استلمت راتب '+fmt(amount));save();render()}
+function daily(){if(s.streakPointDate===new Date().toDateString()){notify('نقطة الستريك لليوم استلمتها بالفعل');return}registerVisitStreak();notify('🔥 نقطة الستريك اليومية انحسبت');save();render()}
+function news(){let day=new Date().toDateString();if(s.lastNews===day){notify('حدث ا
